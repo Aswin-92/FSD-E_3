@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Login</h2>
+    
+    <form id="loginForm" action="login.php" method="POST">
+        <input type="text" id="username" name="username" placeholder="Enter Username">
+        <span id="userError" class="error"></span>
+
+        <input type="password" id="password" name="password" placeholder="Enter Password">
+        <span id="passError" class="error"></span>
+
+        <button type="submit">Login</button>
+        <p id="loginError" class="error"></p>
+    </form>
+</div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", function(e) {
+    let valid = true;
+
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    document.getElementById("userError").innerText = "";
+    document.getElementById("passError").innerText = "";
+
+    if (username === "") {
+        document.getElementById("userError").innerText = "Username is required";
+        valid = false;
+    }
+
+    if (password === "") {
+        document.getElementById("passError").innerText = "Password is required";
+        valid = false;
+    }
+
+    if (!valid) {
+        e.preventDefault();
+    }
+});
+</script>
+
+</body>
+</html>
