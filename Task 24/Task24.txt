@@ -1,0 +1,129 @@
+INDEX.HTML: 
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>Vibe Coding App</title> 
+<link rel="stylesheet" href="style.css"> 
+</head> 
+<body> 
+<div class="container"> 
+<h2>Vibe Coding Cloud Generator</h2> 
+    <textarea id="prompt" placeholder="Enter prompt..."></textarea> 
+    <button onclick="generate()">Generate</button> 
+    <h3>Output</h3> 
+    <pre id="output"></pre> 
+    <h3>Score</h3> 
+    <p id="score"></p> 
+    <h3>Prompt Versions</h3> 
+    <ul id="history"></ul> 
+</div> 
+<script src="script.js"></script> 
+</body> 
+</html> 
+STYLE.CSS: 
+body { 
+    font-family: Arial; 
+    background: #b98bdb; 
+    color: white; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
+    height:100vh; 
+} 
+.container { 
+    width: 400px; 
+    text-align: center; 
+} 
+textarea { 
+    width: 100%; 
+    height: 100px; 
+} 
+button { 
+    padding: 10px; 
+    margin: 10px; 
+    background: #00c6ff; 
+    border: none; 
+} 
+pre { 
+    background: #333; 
+    padding: 10px; 
+} 
+li { 
+    background: #444; 
+    margin: 5px; 
+    padding: 5px; 
+} 
+ 
+SCRIPT.JS: 
+function generate() { 
+    const prompt = document.getElementById("prompt").value; 
+    fetch("/generate", { 
+        method: "POST", 
+        headers: {"Content-Type":"application/json"}, 
+        body: JSON.stringify({ prompt }) 
+    }) 
+    .then(res => res.json()) 
+    .then(data => { 
+        document.getElementById("output").innerText = data.output; 
+        document.getElementById("score").innerText = data.score + "/10"; 
+        loadHistory(); 
+    }); 
+} 
+function loadHistory() { 
+    fetch("/history") 
+    .then(res => res.json()) 
+    .then(data => { 
+        let list = document.getElementById("history"); 
+        list.innerHTML = ""; 
+        data.forEach((p, i) => { 
+            let li = document.createElement("li"); 
+            li.innerText = `v${i+1}: ${p.prompt}`; 
+            list.appendChild(li); 
+        }); 
+    }); 
+} 
+loadHistory(); 
+SERVER.JS: 
+const express = require("express"); 
+const db = require("./db"); 
+const app = express(); 
+app.use(express.json()); 
+app.use(express.static(__dirname)); 
+app.post("/generate", (req, res) => { 
+    const result = db.process(req.body.prompt); 
+    res.json(result); 
+}); 
+app.get("/history", (req, res) => { 
+    res.json(db.getHistory()); 
+}); 
+app.listen(3000, () => { 
+    console.log("        http://localhost:3000"); 
+}); 
+DB.JS: 
+let history = []; 
+function process(prompt) { 
+    let output = ""; 
+    let score = 5; 
+    history.push({ prompt }); 
+    if (prompt.includes("REST")) { 
+        output = `app.get('/api', (req,res)=>res.send('API running'));`; 
+        score = 7; 
+    }  
+    else if (prompt.includes("cloud")) { 
+        output = `Deploy using AWS EC2: 
+1. Launch instance 
+2. Install Node.js 
+3. Run app`; 
+        score = 8; 
+    }  
+    else if (prompt.includes("security")) { 
+        output = `Use HTTPS, JWT authentication, and firewall rules`; 
+        score = 9; 
+    } 
+    score += Math.min(history.length, 2); 
+    return { output, score }; 
+} 
+function getHistory() { 
+    return history; 
+} 
+module.exports = { process, getHistory }; 
