@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>All Customers</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-view {
+            background: #ffd89b;
+            color: #667eea;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        
+        .error {
+            background: rgba(231, 76, 60, 0.3);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ffd89b;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👥 All Customers</h1>
+            <div class="nav">
+                <a href="/">🏠 Home</a>
+                <a href="/invoices">📊 Invoices</a>
+                <a href="/create-invoice">➕ Create Invoice</a>
+            </div>
+        </div>
+        
+        <div th:if="${error}" class="error" th:text="${error}"></div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="customer : ${customers}">
+                    <td th:text="${customer.id}">1</td>
+                    <td th:text="${customer.name}">John Doe</td>
+                    <td th:text="${customer.email}">john@example.com</td>
+                    <td th:text="${customer.phone}">1234567890</td>
+                    <td>
+                        <a th:href="@{/invoices/customer/{id}(id=${customer.id})}" 
+                           class="btn-view">View Invoices →</a>
+                    </td>
+                </tr>
+                <tr th:if="${customers.isEmpty()}">
+                    <td colspan="5" style="text-align: center;">
+                        <span th:if="${error}">⚠️ Customer service is unavailable</span>
+                        <span th:unless="${error}">No customers found</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <a href="/" class="btn-back">← Back to Home</a>
+    </div>
+</body>
+</html>

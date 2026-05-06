@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Create Invoice</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #ffd89b;
+            color: #667eea;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .alert-success {
+            background: rgba(46, 204, 113, 0.3);
+        }
+        
+        .alert-error {
+            background: rgba(231, 76, 60, 0.3);
+        }
+        
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ffd89b;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>➕ Create New Invoice</h1>
+            <div class="nav">
+                <a href="/">🏠 Home</a>
+                <a href="/invoices">📊 Invoices</a>
+                <a href="/customers">👥 Customers</a>
+            </div>
+        </div>
+        
+        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        
+        <form action="/create-invoice" method="post">
+            <div class="form-group">
+                <label>Select Customer *</label>
+                <select name="customerId" required>
+                    <option value="">-- Select Customer --</option>
+                    <option th:each="customer : ${customers}" 
+                            th:value="${customer.id}" 
+                            th:text="${customer.name + ' (ID: ' + customer.id + ')'}">
+                    </option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Description *</label>
+                <input type="text" name="description" required placeholder="Enter invoice description">
+            </div>
+            
+            <div class="form-group">
+                <label>Amount *</label>
+                <input type="number" name="amount" step="0.01" required placeholder="0.00">
+            </div>
+            
+            <button type="submit">Create Invoice</button>
+        </form>
+        
+        <a href="/" class="btn-back" style="display: block; text-align: center; margin-top: 20px;">← Back to Home</a>
+    </div>
+</body>
+</html>

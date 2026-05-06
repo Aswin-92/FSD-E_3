@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>All Invoices</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-paid {
+            color: #6fcf97;
+        }
+        
+        .status-pending {
+            color: #ffd89b;
+        }
+        
+        .status-overdue {
+            color: #e74c3c;
+        }
+        
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ffd89b;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 All Invoices</h1>
+            <div class="nav">
+                <a href="/">🏠 Home</a>
+                <a href="/customers">👥 Customers</a>
+                <a href="/create-invoice">➕ Create Invoice</a>
+            </div>
+        </div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Customer ID</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="invoice : ${invoices}">
+                    <td th:text="${invoice.invoiceNumber}">INV-001</td>
+                    <td th:text="${invoice.customerId}">1</td>
+                    <td th:text="${invoice.description}">Service</td>
+                    <td th:text="${'$' + invoice.amount}">$0.00</td>
+                    <td>
+                        <span th:class="${'status-' + invoice.status.toLowerCase()}" 
+                              th:text="${invoice.status}">PENDING</span>
+                    </td>
+                </tr>
+                <tr th:if="${invoices.isEmpty()}">
+                    <td colspan="5" style="text-align: center;">No invoices found</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <a href="/" class="btn-back">← Back to Home</a>
+    </div>
+</body>
+</html>

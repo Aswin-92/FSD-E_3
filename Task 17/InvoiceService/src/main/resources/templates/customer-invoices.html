@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Invoices</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+        }
+        
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        th {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #ffd89b;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+        }
+        
+        .message {
+            text-align: center;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div th:if="${customer != null}" class="user-info">
+            <h2>Customer: <span th:text="${customer.name}">Customer Name</span></h2>
+            <p>Email: <span th:text="${customer.email}">email@example.com</span></p>
+            <p>Phone: <span th:text="${customer.phone}">1234567890</span></p>
+        </div>
+        
+        <h3>Invoices</h3>
+        
+         <table>
+            <thead>
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Issue Date</th>
+                    <th>Due Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="invoice : ${invoices}">
+                    <td th:text="${invoice.invoiceNumber}">INV-001</td>
+                    <td th:text="${invoice.description}">Service</td>
+                    <td th:text="${'$' + invoice.amount}">$0.00</td>
+                    <td th:text="${invoice.status}">PENDING</td>
+                    <td th:text="${#dates.format(invoice.issueDate, 'yyyy-MM-dd')}">2024-01-01</td>
+                    <td th:text="${#dates.format(invoice.dueDate, 'yyyy-MM-dd')}">2024-02-01</td>
+                </tr>
+                <tr th:if="${invoices.isEmpty()}">
+                    <td colspan="6" class="message">
+                        <span th:if="${message}" th:text="${message}">No invoices found</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <a href="/customers" class="btn-back">← Back to Customers</a>
+    </div>
+</body>
+</html>
