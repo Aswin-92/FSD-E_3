@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2d2d2d 0%, #1e1e1e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            color: #ff6b6b;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            color: #ffd93d;
+            font-size: 1.1em;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .service-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .service-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .service-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .status-up {
+            background: #4caf50;
+            color: white;
+        }
+
+        .status-down {
+            background: #f44336;
+            color: white;
+        }
+
+        .service-info {
+            color: #ddd;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .service-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #ff5252;
+            transform: scale(1.05);
+        }
+
+        .btn-secondary {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #45a049;
+            transform: scale(1.05);
+        }
+
+        .form-container, .data-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-title {
+            color: #ffd93d;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            color: #ffd93d;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1em;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        th {
+            background: rgba(255, 107, 107, 0.3);
+            color: #ffd93d;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            color: #ffd93d;
+            padding: 20px;
+        }
+
+        .error-message {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid #f44336;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab.active {
+            color: #ff6b6b;
+            border-bottom: 2px solid #ff6b6b;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .refresh-btn {
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .service-url {
+            color: #ffd93d;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Microservices Dashboard</h1>
+            <p class="subtitle">Service Registry & Discovery with Eureka</p>
+        </div>
+
+        <div class="services-grid" id="servicesGrid">
+            <div class="loading">Checking services...</div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('users')">👥 User Management</button>
+            <button class="nav-tab" onclick="switchTab('orders')">📦 Order Management</button>
+            <button class="nav-tab" onclick="switchTab('createUser')">➕ Create User</button>
+            <button class="nav-tab" onclick="switchTab('createOrder')">🛒 Create Order</button>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="users" class="tab-content active">
+            <div class="data-container">
+                <h3 style="color: #ffd93d; margin-bottom: 20px;">📋 Registered Users</h3>
+                <div id="usersList">
+                    <div class="loading">Loading users...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="orders" class="tab-content">
+            <div class="data-container">
+                <h3 style="color: #ffd93d; margin-bottom: 20px;">📋 Orders</h3>
+                <div id="ordersList">
+                    <div class="loading">Loading orders...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create User Tab -->
+        <div id="createUser" class="tab-content">
+            <div class="form-container">
+                <h3 class="form-title">➕ Create New User</h3>
+                <div id="createUserMessage"></div>
+                <form id="userForm">
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" id="userName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email:</label>
+                        <input type="email" id="userEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Department:</label>
+                        <input type="text" id="userDepartment" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Create Order Tab -->
+        <div id="createOrder" class="tab-content">
+            <div class="form-container">
+                <h3 class="form-title">🛒 Create New Order</h3>
+                <div id="createOrderMessage"></div>
+                <form id="orderForm">
+                    <div class="form-group">
+                        <label>Product Name:</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity:</label>
+                        <input type="number" id="quantity" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price:</label>
+                        <input type="number" step="0.01" id="price" required>
+                    </div>
+                    <div class="form-group">
+                        <label>User ID:</label>
+                        <input type="number" id="userId" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Create Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get the actual hostname and port
+        const currentHost = window.location.hostname;
+        const currentPort = window.location.port;
+        
+        // Service endpoints - using the actual host where services are running
+        const userServiceUrl = `http://${currentHost}:8081`;
+        const orderServiceUrl = `http://${currentHost}:8082`;
+        const eurekaUrl = `http://${currentHost}:8761`;
+
+        console.log('Dashboard running on:', currentHost);
+        console.log('User Service URL:', userServiceUrl);
+        console.log('Order Service URL:', orderServiceUrl);
+
+        // Services configuration
+        const services = [
+            { name: 'Service Registry (Eureka)', url: eurekaUrl, endpoint: '/', port: 8761, checkEndpoint: '/' },
+            { name: 'User Service', url: userServiceUrl, endpoint: '/api/users', port: 8081, checkEndpoint: '/api/users/service-info' },
+            { name: 'Order Service', url: orderServiceUrl, endpoint: '/api/orders', port: 8082, checkEndpoint: '/api/orders/service-info' }
+        ];
+
+        // Check service status with timeout
+        async function checkServiceStatus(service) {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const response = await fetch(`${service.url}${service.checkEndpoint}`, {
+                    method: 'GET',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                return response.ok;
+            } catch (error) {
+                console.log(`${service.name} is not available:`, error.message);
+                return false;
+            }
+        }
+
+        // Load services status
+        async function loadServicesStatus() {
+            const servicesGrid = document.getElementById('servicesGrid');
+            servicesGrid.innerHTML = '<div class="loading">Checking services...</div>';
+            
+            const servicesStatus = [];
+            for (const service of services) {
+                const isUp = await checkServiceStatus(service);
+                servicesStatus.push({ ...service, status: isUp });
+            }
+            
+            servicesGrid.innerHTML = servicesStatus.map(service => `
+                <div class="service-card">
+                    <div class="service-header">
+                        <div class="service-title">${service.name}</div>
+                        <div class="status-badge ${service.status ? 'status-up' : 'status-down'}">
+                            ${service.status ? '🟢 UP' : '🔴 DOWN'}
+                        </div>
+                    </div>
+                    <div class="service-info">
+                        <strong>Port:</strong> ${service.port}<br>
+                        <strong>URL:</strong> <span class="service-url">${service.url}</span><br>
+                        <strong>Status:</strong> ${service.status ? 'Running' : 'Not Available'}
+                    </div>
+                    <div class="service-actions">
+                        <a href="${service.url}" target="_blank" class="btn btn-primary">Open Service</a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load users
+        async function loadUsers() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch(`${userServiceUrl}/api/users`, {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) throw new Error('Failed to fetch users');
+                
+                const users = await response.json();
+                const usersList = document.getElementById('usersList');
+                
+                if (users.length === 0) {
+                    usersList.innerHTML = '<div class="loading">No users found. Create one!</div>';
+                    return;
+                }
+                
+                usersList.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Name</th><th>Email</th><th>Department</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td>${user.id}</td>
+                                    <td>${user.name}</td>
+                                    <td>${user.email}</td>
+                                    <td>${user.department}</td>
+                                    <td><button onclick="deleteUser(${user.id})" class="btn btn-secondary" style="background: #f44336; padding: 5px 10px;">Delete</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading users:', error);
+                document.getElementById('usersList').innerHTML = `<div class="error-message">❌ Failed to load users. Make sure User Service is running at ${userServiceUrl}</div>`;
+            }
+        }
+
+        // Load orders
+        async function loadOrders() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch(`${orderServiceUrl}/api/orders`, {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                
+                const orders = await response.json();
+                const ordersList = document.getElementById('ordersList');
+                
+                if (orders.length === 0) {
+                    ordersList.innerHTML = '<div class="loading">No orders found. Create one!</div>';
+                    return;
+                }
+                
+                ordersList.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Product</th><th>Quantity</th><th>Price</th><th>User ID</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            ${orders.map(order => `
+                                <tr>
+                                    <td>${order.id}</td>
+                                    <td>${order.productName}</td>
+                                    <td>${order.quantity}</td>
+                                    <td>$${order.price}</td>
+                                    <td>${order.userId}</td>
+                                    <td>${order.status}</td>
+                                    <td><button onclick="deleteOrder(${order.id})" class="btn btn-secondary" style="background: #f44336; padding: 5px 10px;">Delete</button></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                document.getElementById('ordersList').innerHTML = `<div class="error-message">❌ Failed to load orders. Make sure Order Service is running at ${orderServiceUrl}</div>`;
+            }
+        }
+
+        // Create user
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = {
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                department: document.getElementById('userDepartment').value
+            };
+            
+            try {
+                const response = await fetch(`${userServiceUrl}/api/users`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user)
+                });
+                
+                if (response.ok) {
+                    showMessage('createUserMessage', '✅ User created successfully!', 'success');
+                    document.getElementById('userForm').reset();
+                    loadUsers();
+                    setTimeout(() => switchTab('users'), 1500);
+                } else {
+                    const error = await response.text();
+                    showMessage('createUserMessage', `❌ Failed to create user: ${error}`, 'error');
+                }
+            } catch (error) {
+                showMessage('createUserMessage', `❌ Error: ${error.message}. Make sure User Service is running.`, 'error');
+            }
+        });
+
+        // Create order
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const order = {
+                productName: document.getElementById('productName').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                price: parseFloat(document.getElementById('price').value),
+                userId: parseInt(document.getElementById('userId').value)
+            };
+            
+            try {
+                const response = await fetch(`${orderServiceUrl}/api/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
+                });
+                
+                if (response.ok) {
+                    const newOrder = await response.json();
+                    showMessage('createOrderMessage', `✅ Order created successfully! Status: ${newOrder.status}`, 'success');
+                    document.getElementById('orderForm').reset();
+                    loadOrders();
+                    setTimeout(() => switchTab('orders'), 1500);
+                } else {
+                    const error = await response.text();
+                    showMessage('createOrderMessage', `❌ Failed to create order: ${error}`, 'error');
+                }
+            } catch (error) {
+                showMessage('createOrderMessage', `❌ Error: ${error.message}. Make sure Order Service is running.`, 'error');
+            }
+        });
+
+        // Delete user
+        async function deleteUser(id) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                try {
+                    const response = await fetch(`${userServiceUrl}/api/users/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        loadUsers();
+                        showMessage('usersList', '✅ User deleted successfully!', 'success');
+                    } else {
+                        alert('Failed to delete user');
+                    }
+                } catch (error) {
+                    alert('Error deleting user: ' + error.message);
+                }
+            }
+        }
+
+        // Delete order
+        async function deleteOrder(id) {
+            if (confirm('Are you sure you want to delete this order?')) {
+                try {
+                    const response = await fetch(`${orderServiceUrl}/api/orders/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        loadOrders();
+                        showMessage('ordersList', '✅ Order deleted successfully!', 'success');
+                    } else {
+                        alert('Failed to delete order');
+                    }
+                } catch (error) {
+                    alert('Error deleting order: ' + error.message);
+                }
+            }
+        }
+
+        // Show message
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${type === 'success' ? 'success-message' : 'error-message'}">${message}</div>`;
+            setTimeout(() => {
+                element.innerHTML = '';
+            }, 4000);
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            if (tabName === 'users') {
+                loadUsers();
+            } else if (tabName === 'orders') {
+                loadOrders();
+            }
+        }
+
+        // Make functions global
+        window.deleteUser = deleteUser;
+        window.deleteOrder = deleteOrder;
+        window.switchTab = switchTab;
+
+        // Initialize dashboard
+        loadServicesStatus();
+        loadUsers();
+        
+     // Real-time event sync
+        function refreshEvents() {
+            fetch(window.location.href)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newEvents = doc.querySelector('#featuredEvents');
+                    const currentEvents = document.querySelector('#featuredEvents');
+                    if (newEvents && currentEvents) {
+                        currentEvents.innerHTML = newEvents.innerHTML;
+                    }
+                })
+                .catch(err => console.log('Sync error:', err));
+        }
+        setInterval(refreshEvents, 3000);
+    </script>
+</body>
+</html>
