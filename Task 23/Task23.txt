@@ -1,0 +1,108 @@
+INDEX.HTML: 
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>AI Prompt App</title> 
+<link rel="stylesheet" href="style.css"> 
+</head> 
+<body> 
+<div class="container"> 
+    <h2>Prompt Engineering Tool</h2> 
+    <textarea id="prompt" placeholder="Enter your prompt..."></textarea> 
+    <button onclick="generate()">Generate Output</button> 
+    <h3>Generated Output</h3> 
+    <pre id="output"></pre> 
+    <h3>Quality Score</h3> 
+    <p id="score"></p> 
+</div> 
+<script src="script.js"></script> 
+</body> 
+</html> 
+STYLE.CSS: 
+body { 
+    font-family: Arial; 
+    background: #202038; 
+    color: white; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
+    height:100vh; 
+} 
+.container { 
+    width: 400px; 
+    text-align: center; 
+} 
+textarea { 
+    width: 100%; 
+    height: 100px; 
+    margin: 5px; 
+} 
+button { 
+    padding: 10px; 
+    margin: 10px; 
+    background: #00c6ff; 
+    border: none; 
+    color: white; 
+} 
+pre { 
+    background: #333; 
+    padding: 10px; 
+} 
+SCRIPT.JS: 
+function generate() { 
+    const prompt = document.getElementById("prompt").value; 
+    fetch("/generate", { 
+        method: "POST", 
+        headers: {"Content-Type":"application/json"}, 
+        body: JSON.stringify({ prompt }) 
+    }) 
+    .then(res => res.json()) 
+    .then(data => { 
+document.getElementById("output").innerText = data.output; 
+document.getElementById("score").innerText = data.score + "/10"; 
+}); 
+} 
+SERVER.JS: 
+const express = require("express"); 
+const db = require("./db"); 
+const app = express(); 
+// Middleware 
+app.use(express.json()); 
+app.use(express.static(__dirname)); // serve HTML 
+// Home route (optional but useful) 
+app.get("/", (req, res) => { 
+res.sendFile(__dirname + "/index.html"); 
+}); 
+// Generate output 
+app.post("/generate", (req, res) => { 
+const result = db.processPrompt(req.body.prompt); 
+res.json(result); 
+}); 
+// START SERVER WITH LINK 
+app.listen(3000, () => { 
+console.log("        
+Server running at:"); 
+    console.log(" http://localhost:3000"); 
+}); 
+DB.JS: 
+function processPrompt(prompt) { 
+    let output = ""; 
+    let score = 5; 
+    if (prompt.toLowerCase().includes("code")) { 
+        output = `function greet() { 
+    console.log("Hello from AI!"); 
+}`; 
+        score = 9; 
+    }  
+    else if (prompt.toLowerCase().includes("cloud")) { 
+        output = `AWS EC2 Config: - Instance: t2.micro - Region: us-east-1`; 
+        score = 8; 
+    }  
+    else { 
+        output = "Basic AI response generated."; 
+        score = 5; 
+    } 
+ 
+    return { output, score }; 
+} 
+module.exports = { processPrompt };
