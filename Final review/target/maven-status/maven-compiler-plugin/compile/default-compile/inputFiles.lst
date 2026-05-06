@@ -1,0 +1,12 @@
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\BackendApplication.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\config\CorsConfig.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\controller\AuthController.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\controller\BookingController.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\controller\EventController.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\exception\GlobalExceptionHandler.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\model\Booking.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\model\Event.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\model\User.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\repository\BookingRepository.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\repository\EventRepository.java
+C:\code\ticket booking old\backend\src\main\java\com\example\ticketbooking\repository\UserRepository.java
