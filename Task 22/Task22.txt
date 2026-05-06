@@ -1,0 +1,130 @@
+INDEX.HTML: 
+<!DOCTYPE html> 
+<html> 
+<head> 
+<title>Cloud Comparison</title> 
+<link rel="stylesheet" href="style.css"> 
+</head> 
+<body> 
+<div class="container"> 
+    <h2>Cloud Service Comparison</h2> 
+    <select id="provider" onchange="loadData()"> 
+        <option value="aws">AWS</option> 
+        <option value="gcp">GCP</option> 
+        <option value="azure">Azure</option> 
+    </select> 
+    <h3>Services</h3> 
+    <ul id="services"></ul> 
+    <h3>Pricing Calculator</h3> 
+    <input id="hours" placeholder="Compute Hours"> 
+    <input id="storage" placeholder="Storage (GB)"> 
+    <button onclick="calculate()">Calculate Cost</button> 
+    <h3 id="result"></h3> 
+</div> 
+<script src="script.js"></script> 
+</body> 
+</html> 
+STYLE.CSS: 
+body { 
+    font-family: Arial; 
+    background: #1e1e2f; 
+    color: white; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
+    height:100vh; 
+} 
+.container { 
+    text-align:center; 
+    width: 350px; 
+} 
+input, select, button { 
+    margin: 5px; 
+    padding: 8px; 
+} 
+li { 
+    background: #333; 
+    margin: 5px; 
+    padding: 5px; 
+} 
+SCRIPT.JS: 
+function loadData() { 
+    const provider = document.getElementById("provider").value; 
+    fetch(`/services/${provider}`) 
+    .then(res => res.json()) 
+    .then(data => { 
+        let list = document.getElementById("services"); 
+        list.innerHTML = ""; 
+        Object.entries(data).forEach(([key, value]) => { 
+            let li = document.createElement("li"); 
+            li.innerText = `${key}: ${value}`; 
+            list.appendChild(li); 
+        }); 
+    }); 
+} 
+function calculate() { 
+    const provider = document.getElementById("provider").value; 
+    const hours = document.getElementById("hours").value; 
+    const storage = document.getElementById("storage").value; 
+    fetch("/cost", { 
+        method: "POST", 
+        headers: {"Content-Type":"application/json"}, 
+        body: JSON.stringify({ provider, hours, storage }) 
+    }) 
+    .then(res => res.json()) 
+    .then(data => { 
+        document.getElementById("result").innerText = "Cost: $" + data.cost; 
+    }); 
+} 
+loadData(); 
+SERVER.JS: 
+const express = require("express"); 
+const db = require("./db"); 
+const app = express(); 
+app.use(express.json()); 
+app.use(express.static(__dirname)); 
+app.get("/services/:provider", (req, res) => { 
+    res.json(db.getServices(req.params.provider)); 
+}); 
+app.post("/cost", (req, res) => { 
+    const { provider, hours, storage } = req.body; 
+    const cost = db.calculate(provider, hours, storage); 
+    res.json({ cost }); 
+}); 
+app.listen(3000, () => { 
+    console.log("http://localhost:3000"); 
+}); 
+DB.JS: 
+const services = { 
+    aws: { 
+        Compute: "EC2", 
+        Storage: "S3", 
+        Database: "RDS", 
+        Network: "VPC" 
+    }, 
+    gcp: { 
+        Compute: "Compute Engine", 
+        Storage: "Cloud Storage", 
+        Database: "Cloud SQL", 
+        Network: "VPC" 
+    }, 
+    azure: { 
+        Compute: "Virtual Machines", 
+Storage: "Blob Storage", 
+Database: "SQL Database", 
+Network: "VNet" 
+} 
+}; 
+const pricing = { 
+aws: { compute: 0.1, storage: 0.02 }, 
+gcp: { compute: 0.09, storage: 0.025 }, 
+azure: { compute: 0.11, storage: 0.018 } 
+}; 
+function getServices(provider) { 
+return services[provider]; 
+} 
+function calculate(provider, hours, storage) { 
+const p = pricing[provider]; 
+return (hours * p.compute + storage * p.storage).toFixed(2); 
+} 
+module.exports = { getServices, calculate };
